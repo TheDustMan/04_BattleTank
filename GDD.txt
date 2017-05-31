@@ -1,0 +1,19 @@
+Concept
+
+The concept behind TankGame is to assume control of a tank vehicle in an unsteady terrain filled with opponents. Your goal is
+to best your foes and be the last one standing through use of your maneuverability and your control of the turrent to shoot projectiles
+that can damage your enemies.
+
+Rules
+Assume control of a tank and move it around, firing projectiles at the opponents
+Last tank standing wins.
+
+Requirements
+Tank model
+Controls for a player-controlled tank (turret control being independent from the base tank movement)
+AI implementation that can control a tank and fire projectiles at the player.
+The ability to take damage and deal damage via projectiles.
+Main menu and Game Over screens
+A landscape arena to drive around in.
+Projectile particle effects (flying through the air and impact.
+Sound effects for tank movement and projecticle firing/collision
