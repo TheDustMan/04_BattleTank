@@ -3,7 +3,10 @@
 #include "BattleTank.h"
 #include "TankTurret.h"
 
-void UTankTurret::Pivot(float DegreesPerSecond)
+void UTankTurret::Pivot(float RelativeSpeed)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Turret pivot called with speed %s"), *FString::SanitizeFloat(DegreesPerSecond));
+	RelativeSpeed = FMath::Clamp(RelativeSpeed, -1.f, 1.f);
+	float PivotChange = RelativeSpeed * MaxDegreesPerSecond * GetWorld()->GetDeltaSeconds();
+	float NewPivot = RelativeRotation.Yaw + PivotChange;
+	SetRelativeRotation(FRotator(0.f, NewPivot, 0.f));
 }
