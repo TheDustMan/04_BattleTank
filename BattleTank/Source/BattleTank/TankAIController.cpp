@@ -7,68 +7,41 @@
 void ATankAIController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ATank* ControlledTank = GetControlledTank();
-	if (ControlledTank)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AI has possessed pawn: %s"), *ControlledTank->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Unable to find AI possessed pawn"));
-	}
-
-	ATank* PlayerControlledTank = GetPlayerTank();
-	if (PlayerControlledTank)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AI has found player pawn: %s"), *PlayerControlledTank->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Unable to find player possessed pawn"));
-	}
 }
 
 void ATankAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (GetPlayerTank())
-	{
-		// TODO Move towards the player
 
-		// Aim at the player
-		AimAtPlayer();
-
-		// Fire at the player
-	}
-}
-
-void ATankAIController::AimAtPlayer() const
-{
-	if (GetPlayerTank())
-	{
-		GetControlledTank()->AimAt(GetPlayerTank()->GetActorLocation());
-	}
-}
-
-ATank* ATankAIController::GetControlledTank() const
-{
-	return Cast<ATank>(GetPawn());
-}
-
-ATank* ATankAIController::GetPlayerTank() const
-{
+	ATank* ControlledTank = Cast<ATank>(GetPawn());
 	ATank* PlayerTank = nullptr;
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	
 	if (PlayerController)
 	{
 		PlayerTank = Cast<ATank>(PlayerController->GetPawn());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Unable to find first player controller"));
+		UE_LOG(LogTemp, Warning, TEXT("Unable to acces PlayerController, PlayerTank will be NULL"));
 	}
+	
 
-	return PlayerTank;
+	if (PlayerTank && ControlledTank)
+	{
+		// TODO Move towards the player
+
+		// Aim at the player
+		ControlledTank->AimAt(PlayerTank->GetActorLocation());
+
+		// Fire at the player
+		ControlledTank->Fire();
+	}
+	if (!PlayerTank)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NULL reference to PlayerControlled Tank"));
+	}
+	if (!ControlledTank)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NULL reference to AIControlled Tank"));
+	}
 }
