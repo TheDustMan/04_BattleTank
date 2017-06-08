@@ -21,4 +21,8 @@ public:
 
 private:
 	void AimAtPlayer(ATank* PlayerTank) const;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	float AcceptanceRadius = 3000.f; // How close the AI tank can get to the player
 };

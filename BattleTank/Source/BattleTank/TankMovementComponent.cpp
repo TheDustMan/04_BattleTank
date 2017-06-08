@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright DustIndustries
 
 #include "BattleTank.h"
 #include "TankMovementComponent.h"
@@ -46,4 +46,12 @@ void UTankMovementComponent::IntendTurnRight(float Throw)
 	RightTrack->SetThrottle(-Throw);
 }
 
-
+void UTankMovementComponent::RequestDirectMove(const FVector& MoveVelocity, bool bForceMaxSpeed)
+{
+	auto TankForward = GetOwner()->GetActorForwardVector();
+	auto AIForwardIntention = MoveVelocity.GetSafeNormal();
+	float DotProduct = FVector::DotProduct(TankForward, AIForwardIntention);
+	FVector CrossProduct = FVector::CrossProduct(TankForward, AIForwardIntention);
+	IntendTurnRight(CrossProduct.Z);
+	IntendMoveForward(DotProduct);
+}
