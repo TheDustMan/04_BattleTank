@@ -5,12 +5,6 @@
 #include "GameFramework/Pawn.h"
 #include "Tank.generated.h"
 
-class UTankAimingComponent;
-class UTankMovementComponent;
-class UTankBarrel;
-class UTankTurret;
-class AProjectile;
-
 UCLASS()
 class BATTLETANK_API ATank : public APawn
 {
@@ -27,11 +21,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void AimAt(FVector HitLocation) const;
-
-	UFUNCTION(BlueprintCallable, Category = "Firing")
-	void Fire();
-
 private:
-	UTankAimingComponent* TankAimingComponent = nullptr;
+
 };

@@ -3,19 +3,20 @@
 #include "BattleTank.h"
 #include "TankPlayerController.h"
 #include "Tank.h"
+#include "TankAimingComponent.h"
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ATank* ControlledTank = GetControlledTank();
-	if (ControlledTank)
+	auto AimingComponent = GetControlledTankAimingComponent();
+	if (ensure(AimingComponent))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Player has possessed pawn: %s"), *ControlledTank->GetName());
+		FoundAimingComponent(AimingComponent);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Unable to find player possessed pawn"));
+		UE_LOG(LogTemp, Error, TEXT("Player controller can't find aiming component at BeginPlay"));
 	}
 }
 
@@ -25,14 +26,20 @@ void ATankPlayerController::Tick(float DeltaTime)
 	AimAtCrossHair();
 }
 
-ATank* ATankPlayerController::GetControlledTank() const
+UTankAimingComponent* ATankPlayerController::GetControlledTankAimingComponent() const
 {
-	return Cast<ATank>(GetPawn());
+	ATank* Tank = Cast<ATank>(GetPawn());
+	if (!ensure(Tank))
+	{
+		return nullptr;
+	}
+
+	return Tank->FindComponentByClass<UTankAimingComponent>();
 }
 
 void ATankPlayerController::AimAtCrossHair()
 {
-	if (!GetControlledTank())
+	if (!ensure(GetControlledTankAimingComponent()))
 	{
 		return;
 	}
@@ -43,7 +50,7 @@ void ATankPlayerController::AimAtCrossHair()
 	if (GetSightRayHitLocation(HitLocation))
 	{
 		// Tell the controlled tank to aim toward the crosshair
-		GetControlledTank()->AimAt(HitLocation);
+		GetControlledTankAimingComponent()->AimAt(HitLocation);
 	}
 }
 

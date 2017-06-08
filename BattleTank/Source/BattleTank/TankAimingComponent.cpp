@@ -43,7 +43,7 @@ void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UTankAimingComponent::AimAt(FVector Location)
 {
-	if (!Barrel)
+	if (!ensure(Barrel))
 	{
 		return;
 	}
@@ -73,7 +73,7 @@ void UTankAimingComponent::AimAt(FVector Location)
 
 void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 {
-	if (Barrel)
+	if (ensure(Barrel))
 	{
 		// Adjust the Barrel's pitch according to the pitch derived from the AimDirection
 		auto CurrentBarrelRotation = Barrel->GetForwardVector().Rotation();
@@ -83,7 +83,7 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 		//UE_LOG(LogTemp, Warning, TEXT("Current Pitch: %f, AimPitch: %f, ElevateDir: %f"), CurrentBarrelPitch, AimDirection.Rotation().Pitch, ElevateDirection);
 		Barrel->Elevate(DeltaRotation.Pitch);
 	}
-	if (Turret)
+	if (ensure(Turret))
 	{
 		// Adjust the Turret's yaw according to the yaw derived from the AimDirection
 		auto CurrentTurretRotation = Turret->GetForwardVector().Rotation();
@@ -95,14 +95,19 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 
 void UTankAimingComponent::Fire()
 {
+	if (!ensure(Barrel))
+	{
+		return;
+	}
+
 	bool IsReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
-	if (IsReloaded && Barrel)
+	if (IsReloaded)
 	{
 		// Spawn a projectile at the socket location
 		FVector FireLocation = Barrel->GetSocketLocation(FName("Projectile"));
 		FRotator FireRotation = Barrel->GetSocketRotation(FName("Projectile"));;
 		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, FireLocation, FireRotation);
-		if (Projectile)
+		if (ensure(Projectile))
 		{
 			Projectile->LaunchProjectile(LaunchSpeed);
 			LastFireTime = FPlatformTime::Seconds();

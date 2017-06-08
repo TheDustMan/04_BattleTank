@@ -12,12 +12,12 @@ void UTankMovementComponent::Initialize(UTankTrack* LeftTrackToSet, UTankTrack* 
 
 void UTankMovementComponent::IntendMoveForward(float Throw)
 {
-	if (!LeftTrack)
+	if (!ensure(LeftTrack))
 	{
 		UE_LOG(LogTemp, Error, TEXT("NULL reference to LeftTrack"));
 		return;
 	}
-	if (!RightTrack)
+	if (!ensure(RightTrack))
 	{
 		UE_LOG(LogTemp, Error, TEXT("NULL reference to RightTrack"));
 		return;
@@ -31,12 +31,12 @@ void UTankMovementComponent::IntendMoveForward(float Throw)
 
 void UTankMovementComponent::IntendTurnRight(float Throw)
 {
-	if (!LeftTrack)
+	if (!ensure(LeftTrack))
 	{
 		UE_LOG(LogTemp, Error, TEXT("NULL reference to LeftTrack"));
 		return;
 	}
-	if (!RightTrack)
+	if (!ensure(RightTrack))
 	{
 		UE_LOG(LogTemp, Error, TEXT("NULL reference to RightTrack"));
 		return;
