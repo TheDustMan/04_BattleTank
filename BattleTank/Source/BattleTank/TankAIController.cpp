@@ -2,7 +2,6 @@
 
 #include "BattleTank.h"
 #include "TankAIController.h"
-#include "Tank.h"
 #include "TankAimingComponent.h"
 
 void ATankAIController::BeginPlay()
@@ -14,18 +13,13 @@ void ATankAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ATank* ControlledTank = Cast<ATank>(GetPawn());
-	UTankAimingComponent* ControlledTankAimingComponent = nullptr;
-	if (ensure(ControlledTank))
-	{
-		ControlledTankAimingComponent = ControlledTank->FindComponentByClass<UTankAimingComponent>();
-	}
+	UTankAimingComponent* ControlledTankAimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
 
-	ATank* PlayerTank = nullptr;
+	APawn* PlayerTank = nullptr;
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (ensure(PlayerController))
 	{
-		PlayerTank = Cast<ATank>(PlayerController->GetPawn());
+		PlayerTank = PlayerController->GetPawn();
 	}
 	else
 	{
@@ -48,7 +42,7 @@ void ATankAIController::Tick(float DeltaTime)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NULL reference to PlayerControlled Tank"));
 	}
-	if (!ControlledTank)
+	if (!ControlledTankAimingComponent)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NULL reference to AIControlled Tank"));
 	}
