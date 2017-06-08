@@ -4,6 +4,7 @@
 #include "TankBarrel.h"
 #include "TankTurret.h"
 #include "TankAimingComponent.h"
+#include "Projectile.h"
 
 
 // Sets default values for this component's properties
@@ -16,13 +17,9 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
-void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
+void UTankAimingComponent::Initialize(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet)
 {
 	Barrel = BarrelToSet;
-}
-
-void UTankAimingComponent::SetTurretReference(UTankTurret* TurretToSet)
-{
 	Turret = TurretToSet;
 }
 
@@ -44,8 +41,13 @@ void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
-void UTankAimingComponent::AimAt(FVector Location, float LaunchSpeed)
+void UTankAimingComponent::AimAt(FVector Location)
 {
+	if (!Barrel)
+	{
+		return;
+	}
+
 	FVector TossVelocity;
 	bool SuccessfulSuggestion = UGameplayStatics::SuggestProjectileVelocity(
 		GetWorld(),
@@ -88,5 +90,26 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 		auto AimAtRotation = AimDirection.Rotation();
 		auto DeltaRotation = AimAtRotation - CurrentTurretRotation;
 		Turret->Pivot(DeltaRotation.Yaw);
+	}
+}
+
+void UTankAimingComponent::Fire()
+{
+	bool IsReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
+	if (IsReloaded && Barrel)
+	{
+		// Spawn a projectile at the socket location
+		FVector FireLocation = Barrel->GetSocketLocation(FName("Projectile"));
+		FRotator FireRotation = Barrel->GetSocketRotation(FName("Projectile"));;
+		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, FireLocation, FireRotation);
+		if (Projectile)
+		{
+			Projectile->LaunchProjectile(LaunchSpeed);
+			LastFireTime = FPlatformTime::Seconds();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%f: Unable to spawn projectile"), GetWorld()->GetTimeSeconds());
+		}
 	}
 }

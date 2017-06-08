@@ -5,8 +5,10 @@
 #include "Components/StaticMeshComponent.h"
 #include "TankBarrel.generated.h"
 
+class AProjectile;
+
 /**
- * 
+ * Represents the Barrel static mesh component, contains logic for firing projectile and moving barrel
  */
 UCLASS(meta = (BlueprintSpawnableComponent), hidecategories = ("Collision"))
 class BATTLETANK_API UTankBarrel : public UStaticMeshComponent

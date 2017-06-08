@@ -13,18 +13,11 @@ ATank::ATank()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	TankAimingComponent = CreateDefaultSubobject<UTankAimingComponent>(FName("Aiming Component"));
-}
-
-void ATank::SetBarrelReference(UTankBarrel* BarrelToSet)
-{
-	Barrel = BarrelToSet;
-	TankAimingComponent->SetBarrelReference(BarrelToSet);
-}
-
-void ATank::SetTurretReference(UTankTurret* TurretToSet)
-{
-	TankAimingComponent->SetTurretReference(TurretToSet);
+	TankAimingComponent = Cast<UTankAimingComponent>(GetComponentByClass(UTankAimingComponent::StaticClass()));
+	if (!TankAimingComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Tank %s is missing an AimingComponent"), *GetName());
+	}
 }
 
 // Called when the game starts or when spawned
@@ -44,27 +37,14 @@ void ATank::AimAt(FVector HitLocation) const
 {
 	if (TankAimingComponent)
 	{
-		TankAimingComponent->AimAt(HitLocation, LaunchSpeed);
+		TankAimingComponent->AimAt(HitLocation);
 	}
 }
 
 void ATank::Fire()
 {
-	bool IsReloaded = (FPlatformTime::Seconds() - LastFireTime) > ReloadTimeInSeconds;
-	if (Barrel && IsReloaded)
+	if (TankAimingComponent)
 	{
-		// Spawn a projectile at the socket location
-		FVector FireLocation = Barrel->GetSocketLocation(FName("Projectile"));
-		FRotator FireRotation = Barrel->GetSocketRotation(FName("Projectile"));;
-		auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileBlueprint, FireLocation, FireRotation);
-		if (Projectile)
-		{
-			Projectile->LaunchProjectile(LaunchSpeed);
-			LastFireTime = FPlatformTime::Seconds();
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%f: Unable to spawn projectile"), GetWorld()->GetTimeSeconds());
-		}
+		TankAimingComponent->Fire();
 	}
 }
